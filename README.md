@@ -28,8 +28,6 @@
 
 9. Best Practices And Architecture
 
-10. NoSQL
-
-11. Workoshops
+10. Workoshops
 - 1
 - 2
