@@ -144,6 +144,13 @@ $RECYCLE.BIN/
 *.pdf
 *.pages
 
+# Autosaved Office files
+~*.docx
+~*.doc
+
 # Images
 *.jpg
 *.jpeg
+
+# Archives
+*.zip
