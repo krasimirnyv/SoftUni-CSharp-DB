@@ -1,4 +1,4 @@
-# SoftUni-CSharp-OOPModule
+# SoftUni-CSharp-DBModule
 
 **Learned Skills:**
 - Building a database architecture
