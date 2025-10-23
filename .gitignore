@@ -137,3 +137,13 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+
+# Office documents
+*.doc
+*.docx
+*.pdf
+*.pages
+
+# Images
+*.jpg
+*.jpeg
