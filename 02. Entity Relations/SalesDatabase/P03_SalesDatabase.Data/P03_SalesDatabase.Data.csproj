@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\P03_SalesDatabase.Commons\P03_SalesDatabase.Commons.csproj" />
+      <ProjectReference Include="..\P03_SalesDatabase.Data.Models\P03_SalesDatabase.Data.Models.csproj" />
+    </ItemGroup>
+
+</Project>
