@@ -3,9 +3,9 @@ namespace P03_SalesDatabase;
 using Data;
 using Data.Models;
 
-public class PrintData
+public static class PrintData
 {
-    public void Print()
+    public static void Print()
     {
         using SalesContext context = new SalesContext();
 

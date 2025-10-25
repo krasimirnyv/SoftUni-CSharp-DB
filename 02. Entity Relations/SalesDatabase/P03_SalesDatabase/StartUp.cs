@@ -15,6 +15,7 @@ public class StartUp
             Console.WriteLine("Database created successfully.");
             
             DbInitializer.Seed(context);
+            PrintData.Print();
         }
         catch (Exception e)
         {
