@@ -26,9 +26,71 @@ namespace BookShop
         {
             using var db = new BookShopContext();
             DbInitializer.ResetDatabase(db);
+            
+            // string input by default for all problems
+            string input = Console.ReadLine();
+            // result is set here and used from now on for all problems
+            string result = string.Empty;
 
-            int input = int.Parse(Console.ReadLine());
-            int result = CountBooks(db, input);
+            // Problem 02
+            result = GetBooksByAgeRestriction(db, input);
+            
+            // Problem 03
+            result = GetGoldenBooks(db);
+            
+            // Problem 04
+            result = GetBooksByPrice(db);
+            
+            // Problem 05
+            if (int.TryParse(input, out int year))
+                result = GetBooksNotReleasedIn(db, year);
+            else
+                Console.WriteLine("Invalid year input. Input must be Integer!");
+            
+            // Problem 06.1 - No compiled
+            result = GetBooksByCategory(db, input);
+            
+            // Problem 06.2 - Compiled
+            result = GetBooksByCategory_Compiled(db, input);
+            
+            // Problem 07
+            result = GetBooksReleasedBefore(db, input);
+            
+            // Problem 08
+            result = GetAuthorNamesEndingIn(db, input);
+            
+            // Problem 09
+            result = GetBookTitlesContaining(db, input);
+            
+            // Problem 10
+            result = GetBooksByAuthor(db, input);
+            
+            // Problem 11
+            if (int.TryParse(input, out int length))
+                result = CountBooks(db, length).ToString(); // The method returns integer
+            else
+                Console.WriteLine("Invalid year input. Input must be Integer!");
+            
+            // Problem 12
+            result = CountCopiesByAuthor(db);
+            
+            // Problem 13
+            result = GetTotalProfitByCategory(db);
+            
+            // Problem 14
+            result = GetMostRecentBooks(db);
+            
+            // Problem 15 - the three ways of bulk update
+            IncreasePrices(db);
+            IncreasePrices_ThirdParty_Bulk(db);
+            IncreasePrices_Native_EF_8(db);
+            
+            // Problem 16 - the three ways of bulk delete
+            result = RemoveBooks(db).ToString(); // The method returns integer
+            result = RemoveBooks_ThirdParty_Bulk(db).ToString(); // The method returns integer
+            result = RemoveBooks_Native_EF_8(db).ToString(); // The method returns integer
+            
+            // Printing the result from the selected method
             Console.WriteLine(result);
         }
 
@@ -299,13 +361,187 @@ namespace BookShop
         }
         
         // 12. Total Book Copies
+        // Shows using of aggregation functions in DB queries is optimal
+        // EF Core translates aggregation functions to SQL properly, but we should be careful
+        // Keep in mind to use .AsSplitQuery() if required
         public static string CountCopiesByAuthor(BookShopContext context)
         {
-            // TODO: Implement the method 
-            throw new NotImplementedException();
+            var authorsCopies = context
+                .Authors
+                .AsNoTracking()
+                .Select(a => new
+                {
+                    a.FirstName,
+                    a.LastName,
+                    Copies = a.Books
+                        .Sum(b => b.Copies)
+                })
+                .OrderByDescending(a => a.Copies)
+                .ToArray();
+            
+            StringBuilder sb = new StringBuilder();
+            foreach (var author in authorsCopies)
+            {
+                sb.AppendLine($"{author.FirstName} {author.LastName} - {author.Copies}");
+            }
+
+            return sb.ToString().TrimEnd();
         }
         
-        // TODO: Finish the homework form Problem 12 to 16
+        // 13. Profit by Category
+        // Shows that aggregate functions with navigation properties are optimized for DB
+        public static string GetTotalProfitByCategory(BookShopContext context)
+        {
+            var categories = context
+                .Categories
+                .Include(c => c.CategoryBooks)
+                .ThenInclude(cb => cb.Book)
+                .AsNoTracking()
+                .Select(c => new
+                {
+                    c.Name,
+                    TotalProfit = c.CategoryBooks
+                        .Select(cb => cb.Book)
+                        .Sum(b => b.Price * b.Copies)
+                })
+                .OrderByDescending(c => c.TotalProfit)
+                .ThenBy(c => c.Name)
+                .AsSplitQuery()
+                .ToArray();
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var profit in categories)
+            {
+                sb.AppendLine($"{profit.Name} ${profit.TotalProfit:F2}");
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+        
+        // 14. Most Recent Books
+        public static string GetMostRecentBooks(BookShopContext context)
+        {
+            var categories = context
+                .Categories
+                .Include(c => c.CategoryBooks)
+                .ThenInclude(cb => cb.Book)
+                .AsNoTracking()
+                .Select(c => new
+                {
+                    CategoryName = c.Name,
+                    Books = c.CategoryBooks
+                        .Select(cb => cb.Book)
+                        .OrderByDescending(b => b.ReleaseDate)
+                        .Take(3)
+
+                })
+                .OrderBy(c => c.CategoryName)
+                .AsSplitQuery()
+                .ToArray();
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var categoryBooks in categories)
+            {
+                sb.AppendLine($"--{categoryBooks.CategoryName}");
+
+                foreach (Book book in categoryBooks.Books)
+                {
+                    sb.AppendLine($"{book.Title} ({book.ReleaseDate!.Value.Year})");
+                }
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+        
+        // 15. Increase Prices
+        // Older versions of EF Core < 8.0 can't handle bulk update/delete
+        // They are performing multiple atomic updates/deletes -> inefficient query
+        public static void IncreasePrices(BookShopContext context)
+        {
+            IQueryable<Book> booksToUpdate = context
+                .Books
+                .Where(b => b.ReleaseDate != null &&
+                            b.ReleaseDate.Value.Year < 2010);
+
+            foreach (Book book in booksToUpdate)
+            {
+                book.Price += 5;
+            }
+
+            context.SaveChanges();
+        }
+        
+        // For older EF Core versions < 8.0, we can use third party Z.EntityFramework.Plus.EFCore
+        // NuGet packet for bulk operations, but it's paid
+        public static void IncreasePrices_ThirdParty_Bulk(BookShopContext context)
+        {
+            context
+                .Books
+                .Where(b => b.ReleaseDate != null &&
+                            b.ReleaseDate.Value.Year < 2010)
+                .Update(b => new Book
+                {
+                    Price = b.Price + 5
+                });
+        }
+
+        // EF Core 8.0+ has built-in support for bulk updates / delete
+        public static void IncreasePrices_Native_EF_8(BookShopContext context)
+        {
+            context
+                .Books
+                .Where(b => b.ReleaseDate != null &&
+                            b.ReleaseDate.Value.Year < 2010)
+                .ExecuteUpdate(e => e.SetProperty(b => b.Price, b => b.Price + 5));
+        }
+        
+        
+        // 16. Remove Books
+        // Older versions of EF Core < 8.0 can't handle bulk update/delete
+        // They are performing multiple atomic updates/deletes -> inefficient query
+        public static int RemoveBooks(BookShopContext context)
+        {
+            IQueryable<Book> booksToRemove = context
+                .Books
+                .Where(b => b.Copies < 4200);
+            
+            int count = booksToRemove.Count();
+            
+            context.RemoveRange(booksToRemove);
+            context.SaveChanges();
+            
+            return count;
+        }
+        
+        // For older EF Core versions < 8.0, we can use third party Z.EntityFramework.Plus.EFCore
+        // NuGet packet for bulk operations, but it's paid
+        public static int RemoveBooks_ThirdParty_Bulk(BookShopContext context)
+        {
+            var booksToRemove = context
+                .Books
+                .Where(b => b.Copies < 4200);
+            
+            int count = booksToRemove.Count();
+
+            context.BulkDelete(booksToRemove);
+            
+            return count;
+        }
+
+        // EF Core 8.0+ has built-in support for bulk updates / delete
+        public static int RemoveBooks_Native_EF_8(BookShopContext context)
+        {
+            int count = context
+                .Books
+                .Count(b => b.Copies < 4200);
+            
+            context
+                .Books
+                .Where(b => b.Copies < 4200)
+                .ExecuteDelete();
+            
+            return count;
+        }
     }
 }
 
