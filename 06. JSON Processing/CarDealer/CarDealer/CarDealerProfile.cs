@@ -6,7 +6,7 @@ namespace CarDealer
     {
         public CarDealerProfile()
         {
-
+            // Here we need to register our mapping conventions
         }
     }
 }

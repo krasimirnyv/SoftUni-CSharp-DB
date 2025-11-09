@@ -10,8 +10,10 @@
 
         public long TraveledDistance { get; set; }
 
-        public ICollection<Sale> Sales { get; set; } = new List<Sale>();    
+        public virtual ICollection<Sale> Sales { get; set; }
+            = new HashSet<Sale>();    
 
-        public ICollection<PartCar> PartsCars { get; set; } = new List<PartCar>();
+        public virtual ICollection<PartCar> PartsCars { get; set; }
+            = new HashSet<PartCar>();
     }
 }
