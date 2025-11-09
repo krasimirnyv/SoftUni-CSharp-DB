@@ -25,30 +25,30 @@ namespace ProductShop
             
             // Problem 01
             string jsonFileName = "users.json";
-            string jsonFileTest = File.ReadAllText(jsonFileDirPath + jsonFileName);
+            string jsonFileText = File.ReadAllText(jsonFileDirPath + jsonFileName);
             
-            string result = ImportUsers(dbContext, jsonFileTest);
+            string result = ImportUsers(dbContext, jsonFileText);
             Console.WriteLine(result);
             
             // Problem 02
             jsonFileName = "products.json";
-            jsonFileTest = File.ReadAllText(jsonFileDirPath + jsonFileName);
+            jsonFileText = File.ReadAllText(jsonFileDirPath + jsonFileName);
             
-            result = ImportProducts(dbContext, jsonFileTest);
+            result = ImportProducts(dbContext, jsonFileText);
             Console.WriteLine(result);
             
             // Problem 03
             jsonFileName = "categories.json";
-            jsonFileTest = File.ReadAllText(jsonFileDirPath + jsonFileName);
+            jsonFileText = File.ReadAllText(jsonFileDirPath + jsonFileName);
             
-            result = ImportCategories(dbContext, jsonFileTest);
+            result = ImportCategories(dbContext, jsonFileText);
             Console.WriteLine(result);
             
             // Problem 04
             jsonFileName = "categories.json";
-            jsonFileTest = File.ReadAllText(jsonFileDirPath + jsonFileName);
+            jsonFileText = File.ReadAllText(jsonFileDirPath + jsonFileName);
             
-            result = ImportCategoryProducts(dbContext, jsonFileTest);
+            result = ImportCategoryProducts(dbContext, jsonFileText);
             Console.WriteLine(result);
             
             // Problem 05
