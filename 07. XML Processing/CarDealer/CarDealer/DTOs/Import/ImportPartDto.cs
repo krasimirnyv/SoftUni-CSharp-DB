@@ -1,23 +1,24 @@
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
+using System.Xml.Serialization;
 
 namespace CarDealer.DTOs.Import;
 
+[XmlType("Part")]
 public class ImportPartDto
 {
     [Required]
-    [JsonProperty("name")]
+    [XmlElement("name")]
     public string Name { get; set; } = null!; 
 
     [Required]
-    [JsonProperty("price")]
+    [XmlElement("price")]
     public string Price { get; set; } = null!;
 
     [Required]
-    [JsonProperty("quantity")]
+    [XmlElement("quantity")]
     public string Quantity { get; set; } = null!;
 
     [Required]
-    [JsonProperty("supplierId")]
+    [XmlElement("supplierId")]
     public string SupplierId { get; set; } = null!;
 }

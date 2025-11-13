@@ -1,15 +1,16 @@
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
+using System.Xml.Serialization;
 
 namespace CarDealer.DTOs.Import;
 
+[XmlType("Supplier")]
 public class ImportSupplierDto
 {
     [Required]
-    [JsonProperty("name")]
+    [XmlElement("name")]
     public string Name { get; set; } = null!;
 
     [Required]
-    [JsonProperty("isImporter")]
+    [XmlElement("isImporter")]
     public string IsImporter { get; set; } = null!;
 }
