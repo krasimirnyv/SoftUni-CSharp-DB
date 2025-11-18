@@ -26,8 +26,6 @@
 
 8. Entity Framework Core Essentials for ASP.NET
 
-9. Best Practices And Architecture
-
 10. Workoshops
 - 1
 - 2
