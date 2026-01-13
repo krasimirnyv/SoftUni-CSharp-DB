@@ -25,7 +25,3 @@
 7. XML Processing
 
 8. Entity Framework Core Essentials for ASP.NET
-
-10. Workoshops
-- 1
-- 2
